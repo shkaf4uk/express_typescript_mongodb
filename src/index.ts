@@ -1,12 +1,10 @@
-import dotenv from "dotenv";
 import express from 'express'
 import mongoose from "mongoose";
 import * as routes from './routes'
-
-dotenv.config();
+import {configs} from "./config";
 
 const app = express();
-const port = process.env.SERVER_PORT
+const port = configs.port
 
 app.use(express.json())
 
