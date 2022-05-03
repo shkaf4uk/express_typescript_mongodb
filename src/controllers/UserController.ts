@@ -11,7 +11,7 @@ class UserController {
         this.register = this.register.bind(this)
     }
 
-    async register (req: Request, res:Response) {
+    async register (req: Request, res:Response): Promise<Response> {
         try {
             const {email, login, password} = req.body
             const validEmail = this.validateCredentials(email, null)
@@ -36,7 +36,7 @@ class UserController {
         }
     }
 
-    async login (req: Request, res: Response) {
+    async login (req: Request, res: Response): Promise<Response> {
         try {
             const {email, login, password} = req.body
             const emailOrLogin = this.validateCredentials(email, login)
