@@ -59,6 +59,22 @@ class PhotoController {
         }
     }
 
+    async deletePhoto(req: Request, res: Response) {
+        try {
+            const ids = req.body.photoid.split(',')
+            await Photo.deleteMany({
+                owner: new Types.ObjectId(req.user._id),
+                _id: {
+                    $in: ids
+                }
+            })
+            return res.status(200).json({})
+        } catch (e) {
+            console.log(e)
+            res.status(500).send()
+        }
+    }
+
     private async getPhotosByUrl(): Promise<IPhoto[]> {
         try {
             const {data} = await axios.get('https://jsonplaceholder.typicode.com/photos')
@@ -69,7 +85,7 @@ class PhotoController {
         }
     }
 
-    private async addAlbums (photos: IPhoto[], userId: string): Promise<IAlbum[]> {
+    private async addAlbums(photos: IPhoto[], userId: string): Promise<IAlbum[]> {
         try {
             const albumsTitles = [...new Set(photos.map(obj => obj.albumId))];
             const albums = albumsTitles.map(title => ({title, owner: new Types.ObjectId(userId)}))

@@ -11,4 +11,5 @@ export const register = (app: express.Application) => {
     app.post("/load-photos", authMiddleware, PhotoController.loadPhotos);
     app.get("/get-photos", PhotoController.getPhotos);
 
+    app.delete("/delete-photo", authMiddleware, PhotoController.deletePhoto);
 };
