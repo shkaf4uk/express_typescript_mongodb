@@ -48,7 +48,7 @@ class UserController {
             const validPassword = user.password === this.getHash(password)
             if (!validPassword) return res.status(400).send('Password not valid')
 
-            const token = jwt.sign({ id: user._id.toString() }, configs.secret, { expiresIn: '12h' })
+            const token = jwt.sign({ _id: user._id.toString() }, configs.secret, { expiresIn: '12h' })
             return res.status(200).json({token})
         } catch (e) {
             console.log('e: ', e)

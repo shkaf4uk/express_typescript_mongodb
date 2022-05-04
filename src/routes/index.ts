@@ -8,10 +8,6 @@ export const register = (app: express.Application) => {
     app.post("/register", UserController.register);
     app.post("/login", UserController.login);
 
-    app.post("/load-photos", authMiddleware, PhotoController.loadPhoto);
-
-    app.get("/users", (req: Request, res: Response) => {
-        res.send('ALL users!')
-    });
+    app.post("/load-photos", authMiddleware, PhotoController.loadPhotos);
 
 };
