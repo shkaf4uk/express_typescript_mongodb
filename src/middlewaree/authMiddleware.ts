@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from 'express'
+import {NextFunction, Request, Response} from 'express'
 import jwt from "jsonwebtoken";
 import {configs} from "../config";
 
@@ -13,11 +13,8 @@ export default function (req: Request, res:Response, next:NextFunction) {
 
     try {
         const token = req.headers.authorization.split(' ')[1]
-        console.log('token: ', token)
         if (!token) return res.status(403).json({message: 'User not authorized'})
-        const decodedData = jwt.verify(token, configs.secret)
-        console.log('decodedData: ', decodedData)
-        req.user = decodedData
+        req.user = jwt.verify(token, configs.secret)
         next()
     } catch (e) {
         console.log(e)

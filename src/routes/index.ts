@@ -9,5 +9,6 @@ export const register = (app: express.Application) => {
     app.post("/login", UserController.login);
 
     app.post("/load-photos", authMiddleware, PhotoController.loadPhotos);
+    app.get("/get-photos", PhotoController.getPhotos);
 
 };

@@ -1,4 +1,4 @@
 export const configs = {
     secret: 'random_secret_key',
-    port: 8080
+    port: 3000
 }
