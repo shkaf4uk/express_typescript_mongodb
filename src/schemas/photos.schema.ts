@@ -1,5 +1,5 @@
 import {Schema, model, Types} from "mongoose";
-import {IPhoto} from "../interfaces/photo.interface";
+import {IPhoto} from "../interfaces/photo-create.interface";
 
 const photoSchema = new Schema<IPhoto>({
         title: {type: String, required: true},

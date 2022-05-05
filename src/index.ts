@@ -1,11 +1,17 @@
-import express from 'express'
+import express, {Request, Response, NextFunction} from 'express'
 import mongoose from "mongoose";
 import * as routes from './routes'
 import {configs} from "./config";
 
+function loggerMiddleware(request: Request, response: Response, next: NextFunction) {
+    console.log(`${request.method} ${request.path}`);
+    next();
+}
+
 const app = express();
 const port = configs.port
 
+app.use(loggerMiddleware)
 app.use(express.json())
 
 routes.register(app)

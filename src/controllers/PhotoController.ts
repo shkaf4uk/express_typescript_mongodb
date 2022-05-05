@@ -1,17 +1,10 @@
 import {Request, Response} from 'express'
-import axios from 'axios';
 import {Types} from 'mongoose'
+import axios from 'axios';
 import {Photo} from '../schemas/photos.schema'
 import {Album} from '../schemas/albums.schema'
 import {IAlbum} from "../interfaces/ambul.interface";
-
-interface IPhoto {
-    albumId: number,
-    id: number,
-    title: string,
-    url: string,
-    thumbnailUrl: string
-}
+import {IPhotoDownload} from '../interfaces/photo-download.interface'
 
 class PhotoController {
     constructor() {
@@ -59,9 +52,11 @@ class PhotoController {
         }
     }
 
-    async deletePhoto(req: Request, res: Response) {
+    async deletePhoto(req: Request, res: Response): Promise<Response> {
         try {
-            const ids = req.body.photoid.split(',')
+            const {photoid} = req.body
+            if (!photoid) return res.status(400).send('Need photoid')
+            const ids = photoid.split(',')
             await Photo.deleteMany({
                 owner: new Types.ObjectId(req.user._id),
                 _id: {
@@ -75,7 +70,7 @@ class PhotoController {
         }
     }
 
-    private async getPhotosByUrl(): Promise<IPhoto[]> {
+    private async getPhotosByUrl(): Promise<IPhotoDownload[]> {
         try {
             const {data} = await axios.get('https://jsonplaceholder.typicode.com/photos')
             return data
@@ -85,7 +80,7 @@ class PhotoController {
         }
     }
 
-    private async addAlbums(photos: IPhoto[], userId: string): Promise<IAlbum[]> {
+    private async addAlbums(photos: IPhotoDownload[], userId: string): Promise<IAlbum[]> {
         try {
             const albumsTitles = [...new Set(photos.map(obj => obj.albumId))];
             const albums = albumsTitles.map(title => ({title, owner: new Types.ObjectId(userId)}))
