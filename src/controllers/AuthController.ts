@@ -1,17 +1,25 @@
-import {Request, Response} from 'express'
+import {Request, Response, Router} from 'express'
 import validator from 'validator'
 import jwt from 'jsonwebtoken'
 import {createHash} from 'crypto'
 import {User} from "../schemas/users.schema";
 import {configs} from '../config'
+import {IController} from "../interfaces/controller.interface";
 
-class UserController {
+export class AuthController implements IController {
+    public path = '/';
+    public router = Router();
+
     constructor() {
-        this.login = this.login.bind(this)
-        this.register = this.register.bind(this)
+        this.initializeRoutes();
     }
 
-    async register (req: Request, res:Response): Promise<Response> {
+    private initializeRoutes() {
+        this.router.post('/register', this.register.bind(this));
+        this.router.post('/login', this.login.bind(this));
+    }
+
+    private async register(req: Request, res: Response): Promise<Response> {
         try {
             const {email, login, password} = req.body
             const validEmail = this.validateCredentials(email, null)
@@ -36,7 +44,7 @@ class UserController {
         }
     }
 
-    async login (req: Request, res: Response): Promise<Response> {
+    private async login(req: Request, res: Response): Promise<Response> {
         try {
             const {email, login, password} = req.body
             const emailOrLogin = this.validateCredentials(email, login)
@@ -48,7 +56,7 @@ class UserController {
             const validPassword = user.password === this.getHash(password)
             if (!validPassword) return res.status(400).send('Password not valid')
 
-            const token = jwt.sign({ _id: user._id.toString() }, configs.secret, { expiresIn: '12h' })
+            const token = jwt.sign({_id: user._id.toString()}, configs.secret, {expiresIn: '12h'})
             return res.status(200).json({token})
         } catch (e) {
             console.log('e: ', e)
@@ -66,5 +74,3 @@ class UserController {
 
     private getHash = (password: string): string => createHash('md5').update(password).digest('hex')
 }
-
-export default new UserController()

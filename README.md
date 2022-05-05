@@ -1,5 +1,5 @@
-# express_typescript_mongodb
+## express_typescript_mongodb
 
-Start server localy
+Start server locally
 
-npm run dev
+#### npm run dev

@@ -1,17 +1,28 @@
-import {Request, Response} from 'express'
+import {Request, Response, Router} from 'express'
 import {Types} from 'mongoose'
 import axios from 'axios';
 import {Photo} from '../schemas/photos.schema'
 import {Album} from '../schemas/albums.schema'
+import authMiddleware from "../middlewaree/authMiddleware";
 import {IAlbum} from "../interfaces/ambul.interface";
 import {IPhotoDownload} from '../interfaces/photo-download.interface'
+import {IController} from "../interfaces/controller.interface";
 
-class PhotoController {
+export class PhotoController implements IController {
+    public path = '/';
+    public router = Router();
+
     constructor() {
-        this.loadPhotos = this.loadPhotos.bind(this)
+        this.initializeRoutes();
     }
 
-    async loadPhotos(req: Request, res: Response): Promise<Response> {
+    private initializeRoutes() {
+        this.router.post('/load-photos', authMiddleware, this.loadPhotos.bind(this));
+        this.router.get('/get-photos',  this.getPhotos.bind(this));
+        this.router.delete('/delete-photo', authMiddleware, this.deletePhoto.bind(this));
+    }
+
+    private async loadPhotos(req: Request, res: Response): Promise<Response> {
         try {
             const userId = req.user._id
             const photosData = await this.getPhotosByUrl()
@@ -21,7 +32,7 @@ class PhotoController {
                 const albumData = userAlbums.find(album => album.title === photo.albumId.toString())
                 return {
                     owner: new Types.ObjectId(userId),
-                    albumId: new Types.ObjectId(albumData._id),
+                    albumId: albumData._id,
                     title: photo.title,
                     url: photo.url,
                     thumbnailUrl: photo.thumbnailUrl
@@ -35,7 +46,7 @@ class PhotoController {
         }
     }
 
-    async getPhotos(req: Request, res: Response): Promise<Response> {
+    private async getPhotos(req: Request, res: Response): Promise<Response> {
         try {
             const {ownerid, page, maxcount} = req.query
             const photosPerPage = 5
@@ -52,18 +63,20 @@ class PhotoController {
         }
     }
 
-    async deletePhoto(req: Request, res: Response): Promise<Response> {
+    private async deletePhoto(req: Request, res: Response): Promise<Response> {
         try {
             const {photoid} = req.body
-            if (!photoid) return res.status(400).send('Need photoid')
+            if (!photoid) return res.status(400).send('Need params photoid')
             const ids = photoid.split(',')
-            await Photo.deleteMany({
+            const photos = await Photo.deleteMany({
                 owner: new Types.ObjectId(req.user._id),
                 _id: {
                     $in: ids
                 }
             })
-            return res.status(200).json({})
+            return res.status(200).json({
+                deletedPhotos: photos.deletedCount
+            })
         } catch (e) {
             console.log(e)
             res.status(500).send()
@@ -91,5 +104,3 @@ class PhotoController {
         }
     }
 }
-
-export default new PhotoController()

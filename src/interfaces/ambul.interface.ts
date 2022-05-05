@@ -1,5 +1,7 @@
+import {ObjectId} from 'mongoose';
+
 export interface IAlbum {
-    _id: string,
+    _id: ObjectId,
     title: string,
-    owner: object
+    owner: ObjectId
 }

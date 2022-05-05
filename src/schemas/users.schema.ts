@@ -1,5 +1,5 @@
-import {Schema, model} from "mongoose";
-import {IUser} from "../interfaces/user.interface";
+import {Schema, model} from 'mongoose';
+import {IUser} from '../interfaces/user.interface';
 
 const usersSchema = new Schema<IUser>({
         login: {type: String, required: true, minlength: 3, maxlength: 50, unique: true, trim: true},
